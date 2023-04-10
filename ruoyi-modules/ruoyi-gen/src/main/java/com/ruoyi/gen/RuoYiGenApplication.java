@@ -1,8 +1,8 @@
 package com.ruoyi.gen;
 
+import com.ruoyi.common.security.annotation.EnableCustomNoAspectConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import com.ruoyi.common.security.annotation.EnableCustomConfig;
 import com.ruoyi.common.security.annotation.EnableRyFeignClients;
 import com.ruoyi.common.swagger.annotation.EnableCustomSwagger2;
 
@@ -11,7 +11,7 @@ import com.ruoyi.common.swagger.annotation.EnableCustomSwagger2;
  * 
  * @author ruoyi
  */
-@EnableCustomConfig
+@EnableCustomNoAspectConfig
 @EnableCustomSwagger2   
 @EnableRyFeignClients
 @SpringBootApplication
