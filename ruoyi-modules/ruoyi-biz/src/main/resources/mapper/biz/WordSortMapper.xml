@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.WordSortMapper">
+    
+    <resultMap type="WordSort" id="WordSortResult">
+        <result property="id"    column="id"    />
+        <result property="sort"    column="sort"    />
+        <result property="word"    column="word"    />
+        <result property="wordType"    column="word_type"    />
+        <result property="sortId"    column="sort_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectWordSortVo">
+        select id, sort, word, word_type, sort_id, create_by, create_time, update_by, update_time, remark from word_sort
+    </sql>
+
+    <select id="selectWordSortList" parameterType="WordSort" resultMap="WordSortResult">
+        <include refid="selectWordSortVo"/>
+        <where>  
+            <if test="sort != null "> and sort = #{sort}</if>
+            <if test="word != null  and word != ''"> and word = #{word}</if>
+            <if test="wordType != null  and wordType != ''"> and word_type = #{wordType}</if>
+            <if test="sortId != null "> and sort_id = #{sortId}</if>
+        </where>
+    </select>
+    
+    <select id="selectWordSortById" parameterType="Long" resultMap="WordSortResult">
+        <include refid="selectWordSortVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWordSort" parameterType="WordSort" useGeneratedKeys="true" keyProperty="id">
+        insert into word_sort
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sort != null">sort,</if>
+            <if test="word != null">word,</if>
+            <if test="wordType != null">word_type,</if>
+            <if test="sortId != null">sort_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sort != null">#{sort},</if>
+            <if test="word != null">#{word},</if>
+            <if test="wordType != null">#{wordType},</if>
+            <if test="sortId != null">#{sortId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWordSort" parameterType="WordSort">
+        update word_sort
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="word != null">word = #{word},</if>
+            <if test="wordType != null">word_type = #{wordType},</if>
+            <if test="sortId != null">sort_id = #{sortId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWordSortById" parameterType="Long">
+        delete from word_sort where id = #{id}
+    </delete>
+
+    <delete id="deleteWordSortByIds" parameterType="String">
+        delete from word_sort where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 批量插入 -->
+    <insert id="insertWordSortBatch" parameterType="java.util.List">
+        insert into word_sort
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sort != null">sort,</if>
+            <if test="word != null">word,</if>
+            <if test="wordType != null">word_type,</if>
+            <if test="sortId != null">sort_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <foreach collection="list" item="item" index="index" separator="union all">
+            <trim prefix="select " suffix=" from dual" suffixOverrides=",">
+                <if test="item.sort != null">#{item.sort},</if>
+                <if test="item.word != null">#{item.word},</if>
+                <if test="item.wordType != null">#{item.wordType},</if>
+                <if test="item.sortId != null">#{item.sortId},</if>
+                <if test="item.createBy != null">#{item.createBy},</if>
+                <if test="item.createTime != null">#{item.createTime},</if>
+                <if test="item.remark != null">#{item.remark},</if>
+            </trim>
+        </foreach>
+    </insert>
+
+    <!-- 当前最大的sort -->
+    <select id="selectMaxSort" parameterType="WordSort" resultType="Integer">
+        select max(sort) from word_sort
+        <where>
+            <if test="sortId != null "> and sort_id = #{sortId}</if>
+        </where>
+    </select>
+</mapper>

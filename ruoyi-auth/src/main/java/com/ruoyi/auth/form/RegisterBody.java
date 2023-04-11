@@ -8,4 +8,5 @@ package com.ruoyi.auth.form;
 public class RegisterBody extends LoginBody
 {
 
+
 }
