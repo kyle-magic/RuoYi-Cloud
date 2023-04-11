@@ -1,4 +1,4 @@
-package com.ruoyi.empty;
+package com.ruoyi.biz;
 
 import com.ruoyi.common.security.annotation.EnableCustomConfig;
 import com.ruoyi.common.security.annotation.EnableRyFeignClients;
