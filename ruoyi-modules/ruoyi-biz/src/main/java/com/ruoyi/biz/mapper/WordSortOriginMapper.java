@@ -27,6 +27,9 @@ public interface WordSortOriginMapper
      */
     public List<WordSortOrigin> selectWordSortOriginList(WordSortOrigin wordSortOrigin);
 
+    public List<WordSortOrigin> selectWordSortEmpty(WordSortOrigin wordSortOrigin);
+
+
     /**
      * 新增单词排行榜
      * 
@@ -58,4 +61,19 @@ public interface WordSortOriginMapper
      * @return 结果
      */
     public int deleteWordSortOriginByIds(Long[] ids);
+
+    /**
+     * 批量插入
+     * @param wordSortOriginList
+     * @return
+     */
+    public int insertWordSortOriginBatch(List<WordSortOrigin> wordSortOriginList);
+
+/**
+     * 批量更新
+     * @param wordSortOriginList
+     * @return
+     */
+    public int updateWordSortOriginBatch(List<WordSortOrigin> wordSortOriginList);
+
 }

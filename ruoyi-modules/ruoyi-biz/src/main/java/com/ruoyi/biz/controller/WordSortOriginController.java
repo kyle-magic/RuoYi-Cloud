@@ -97,9 +97,20 @@ public class WordSortOriginController extends BaseController
      */
     @RequiresPermissions("system:origin:remove")
     @Log(title = "单词排行榜", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
+	  @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(wordSortOriginService.deleteWordSortOriginByIds(ids));
     }
+
+    /**
+     * 爬取 todo 放到job中去
+     */
+    @Log(title = "单词排行榜", businessType = BusinessType.OTHER)
+    @GetMapping("/spider")
+    public AjaxResult spider(Integer index) throws IOException
+    {
+        return toAjax(wordSortOriginService.startCrawl(index));
+    }
+
 }

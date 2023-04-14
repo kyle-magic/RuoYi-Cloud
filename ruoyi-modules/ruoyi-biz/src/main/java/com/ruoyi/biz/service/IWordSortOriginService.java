@@ -58,4 +58,12 @@ public interface IWordSortOriginService
      * @return 结果
      */
     public int deleteWordSortOriginById(Long id);
+
+    /**
+     * 根据index开始爬取数据
+     *
+     * @param index
+     * @return 结果
+     */
+    public int startCrawl(int index);
 }

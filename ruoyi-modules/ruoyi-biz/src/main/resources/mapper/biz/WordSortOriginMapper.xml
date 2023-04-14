@@ -30,6 +30,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="sortId != null "> and sort_id = #{sortId}</if>
         </where>
     </select>
+    <!-- 查询出wordInfo为空的数据 -->
+    <select id="selectWordSortEmpty" parameterType="WordSortOrigin" resultMap="WordSortOriginResult">
+        <include refid="selectWordSortOriginVo"/>
+        where word_info is null or word_info=''
+    </select>
     
     <select id="selectWordSortOriginById" parameterType="Long" resultMap="WordSortOriginResult">
         <include refid="selectWordSortOriginVo"/>
@@ -88,4 +93,47 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <!--批量插入-->
+    <insert id="insertWordSortOriginBatch" parameterType="java.util.List">
+        insert into word_sort_origin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sort != null">sort,</if>
+            <if test="word != null and word != ''">word,</if>
+            <if test="wordInfo != null">word_info,</if>
+            <if test="sortId != null">sort_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <foreach collection="list" item="item" index="index" separator="union all">
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="item.sort != null">#{item.sort},</if>
+                <if test="item.word != null and item.word != ''">#{item.word},</if>
+                <if test="item.wordInfo != null">#{item.wordInfo},</if>
+                <if test="item.sortId != null">#{item.sortId},</if>
+                <if test="item.createBy != null">#{item.createBy},</if>
+                <if test="item.createTime != null">#{item.createTime},</if>
+                <if test="item.remark != null">#{item.remark},</if>
+             </trim>
+        </foreach>
+    </insert>
+
+    <!-- batch update -->
+    <update id="updateWordSortOriginBatch" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" separator=";">
+            update word_sort_origin
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="item.sort != null">sort = #{item.sort},</if>
+                <if test="item.word != null and item.word != ''">word = #{item.word},</if>
+                <if test="item.wordInfo != null">word_info = #{item.wordInfo},</if>
+                <if test="item.sortId != null">sort_id = #{item.sortId},</if>
+                <if test="item.createBy != null">create_by = #{item.createBy},</if>
+                <if test="item.createTime != null">create_time = #{item.createTime},</if>
+                <if test="item.remark != null">remark = #{item.remark},</if>
+            </trim>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
 </mapper>
