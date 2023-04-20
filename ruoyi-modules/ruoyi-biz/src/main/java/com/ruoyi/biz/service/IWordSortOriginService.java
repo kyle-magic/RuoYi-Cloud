@@ -66,4 +66,11 @@ public interface IWordSortOriginService
      * @return 结果
      */
     public int startCrawl(int index);
+
+    /**
+     * 解析wordMean
+     */
+    public Integer parseWordMean(Integer index);
+
+    public Integer redundancyWordMean(Integer index);
 }

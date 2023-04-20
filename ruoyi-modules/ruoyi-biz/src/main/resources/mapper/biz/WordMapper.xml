@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.WordMapper">
+    
+    <resultMap type="Word" id="WordResult">
+        <result property="id"    column="id"    />
+        <result property="word"    column="word"    />
+        <result property="wordMeanRedundancy"    column="word_mean_redundancy"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectWordVo">
+        select id, word, word_mean_redundancy, create_by, create_time, update_by, update_time, remark from word
+    </sql>
+
+    <select id="selectWordList" parameterType="Word" resultMap="WordResult">
+        <include refid="selectWordVo"/>
+        <where>  
+            <if test="word != null  and word != ''"> and word = #{word}</if>
+            <if test="wordMeanRedundancy != null  and wordMeanRedundancy != ''"> and word_mean_redundancy = #{wordMeanRedundancy}</if>
+        </where>
+    </select>
+    
+    <select id="selectWordById" parameterType="Long" resultMap="WordResult">
+        <include refid="selectWordVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWord" parameterType="Word" useGeneratedKeys="true" keyProperty="id">
+        insert into word
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="word != null and word != ''">word,</if>
+            <if test="wordMeanRedundancy != null and wordMeanRedundancy != ''">word_mean_redundancy,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="word != null and word != ''">#{word},</if>
+            <if test="wordMeanRedundancy != null and wordMeanRedundancy != ''">#{wordMeanRedundancy},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWord" parameterType="Word">
+        update word
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="word != null and word != ''">word = #{word},</if>
+            <if test="wordMeanRedundancy != null and wordMeanRedundancy != ''">word_mean_redundancy = #{wordMeanRedundancy},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWordById" parameterType="Long">
+        delete from word where id = #{id}
+    </delete>
+
+    <delete id="deleteWordByIds" parameterType="String">
+        delete from word where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- batch update -->
+    <update id="batchUpdateWord" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" separator=";">
+            update word
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="item.word != null and item.word != ''">word = #{item.word},</if>
+                <if test="item.wordMeanRedundancy != null">word_mean_redundancy = #{item.wordMeanRedundancy},</if>
+                <if test="item.createBy != null and item.createBy != ''">create_by = #{item.createBy},</if>
+                <if test="item.createTime != null">create_time = #{item.createTime},</if>
+                <if test="item.updateBy != null and item.updateBy != ''">update_by = #{item.updateBy},</if>
+                <if test="item.updateTime != null">update_time = #{item.updateTime},</if>
+                <if test="item.remark != null and item.remark != ''">remark = #{item.remark},</if>
+            </trim>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <!-- selectWordByWord -->
+    <select id="selectWordByWord" parameterType="String" resultMap="WordResult">
+        <include refid="selectWordVo"/>
+        where word = #{word}
+    </select>
+</mapper>

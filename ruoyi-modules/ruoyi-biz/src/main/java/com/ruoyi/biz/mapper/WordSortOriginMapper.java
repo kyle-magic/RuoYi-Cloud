@@ -76,4 +76,6 @@ public interface WordSortOriginMapper
      */
     public int updateWordSortOriginBatch(List<WordSortOrigin> wordSortOriginList);
 
+    public List<Long> selectWordSortOriginIdList();
+
 }

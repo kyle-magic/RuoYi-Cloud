@@ -113,4 +113,25 @@ public class WordSortOriginController extends BaseController
         return toAjax(wordSortOriginService.startCrawl(index));
     }
 
+    /**
+     * 解析wordMean
+     *
+     */
+    @Log(title = "单词排行榜", businessType = BusinessType.OTHER)
+    @GetMapping("/parse")
+    public AjaxResult parse(Integer index)
+    {
+        return toAjax(wordSortOriginService.parseWordMean(index));
+    }
+
+    /**
+     * redundancyWordMean
+     *
+     */
+    @GetMapping("/redundancy")
+    public AjaxResult redundancy(Integer index)
+    {
+        return toAjax(wordSortOriginService.redundancyWordMean(index));
+    }
+
 }

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.WordFlagRelationMapper">
+    
+    <resultMap type="WordFlagRelation" id="WordFlagRelationResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="flagId"    column="flag_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectWordFlagRelationVo">
+        select id, user_id, flag_id, del_flag, create_by, create_time, update_by, update_time, remark from word_flag_relation
+    </sql>
+
+    <select id="selectWordFlagRelationList" parameterType="WordFlagRelation" resultMap="WordFlagRelationResult">
+        <include refid="selectWordFlagRelationVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="flagId != null "> and flag_id = #{flagId}</if>
+        </where>
+    </select>
+    
+    <select id="selectWordFlagRelationById" parameterType="Long" resultMap="WordFlagRelationResult">
+        <include refid="selectWordFlagRelationVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWordFlagRelation" parameterType="WordFlagRelation" useGeneratedKeys="true" keyProperty="id">
+        insert into word_flag_relation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="flagId != null">flag_id,</if>
+            <if test="delFlag != null and delFlag != ''">del_flag,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="flagId != null">#{flagId},</if>
+            <if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWordFlagRelation" parameterType="WordFlagRelation">
+        update word_flag_relation
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="flagId != null">flag_id = #{flagId},</if>
+            <if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWordFlagRelationById" parameterType="Long">
+        delete from word_flag_relation where id = #{id}
+    </delete>
+
+    <delete id="deleteWordFlagRelationByIds" parameterType="String">
+        delete from word_flag_relation where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据 user_id、word_id、flag_id 删除 -->
+    <delete id="deleteWordFlagRelationByUserIdAndWordIdAndFlagId" parameterType="WordFlagRelation">
+        delete from word_flag_relation where user_id = #{userId} and word_id = #{wordId} and flag_id = #{flagId}
+    </delete>
+</mapper>

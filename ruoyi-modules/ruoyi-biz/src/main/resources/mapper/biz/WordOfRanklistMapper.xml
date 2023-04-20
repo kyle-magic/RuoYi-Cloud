@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.WordOfRanklistMapper">
+    
+    <resultMap type="WordOfRanklist" id="WordOfRanklistResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="rankListId"    column="rank_list_id"    />
+        <result property="wordId"    column="word_id"    />
+        <result property="rankNum"    column="rank_num"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectWordOfRanklistVo">
+        select id, user_id, rank_list_id, word_id, rank_num, del_flag, create_by, create_time, update_by, update_time, remark from word_of_ranklist
+    </sql>
+
+    <select id="selectWordOfRanklistList" parameterType="WordOfRanklist" resultMap="WordOfRanklistResult">
+        <include refid="selectWordOfRanklistVo"/>
+        <where>
+            user_id = #{userId}
+            and rank_list_id = #{rankListId}
+            <if test="wordId != null  and wordId != ''"> and word_id = #{wordId}</if>
+            <if test="rankNum != null "> and rank_num = #{rankNum}</if>
+        </where>
+    </select>
+
+
+    <resultMap id="wordOfRanklistRes" type="com.ruoyi.biz.domain.WordOfRanklistResDto">
+        <result column="one_id" property="id"/>
+        <result column="one_user_id" property="userId"/>
+        <result column="one_rank_list_id" property="rankListId"/>
+        <result column="one_word_id" property="wordId"/>
+        <result column="one_rank_num" property="rankNum"/>
+        <result column="one_remark" property="remark"/>
+        <result column="one_word" property="word"/>
+        <result column="one_word_mean" property="wordMean"/>
+    </resultMap>
+
+    <!-- 查询单词排行榜 -->
+    <select id="selectWordOfRanklist" parameterType="WordOfRanklistReqDto" resultMap="wordOfRanklistRes">
+        select wfr.id one_id
+             , wfr.user_id one_user_id
+             , wfr.rank_list_id one_rank_list_id
+             , wfr.word_id one_word_id
+             , wfr.rank_num one_rank_num
+             , wfr.remark one_remark
+             , w.word one_word
+             , w.word_mean_redundancy one_word_mean
+        from word_of_ranklist wfr
+        left join word w on wfr.word_id = w.id
+        <if test="wordFlags!=null and wordFlags.size>0">
+            left join (
+            select distinct word_id word_flag_relation where user_id = #{userId} and flag_id in
+            <foreach item="flagId" collection="wordFlags" open="(" separator="," close=")">
+                #{flagId}
+            </foreach>
+            ) wfl on w.id = wfl.word_id
+        </if>
+        <where>
+            wfr.user_id = #{userId}
+            and wfr.rank_list_id = #{rankListId}
+            <if test="wordFlags!=null and wordFlags.size>0"> and wfl.word_id is not null</if>
+        </where>
+        order by wfr.rank_num
+    </select>
+    
+    <select id="selectWordOfRanklistById" parameterType="Long" resultMap="WordOfRanklistResult">
+        <include refid="selectWordOfRanklistVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWordOfRanklist" parameterType="WordOfRanklist" useGeneratedKeys="true" keyProperty="id">
+        insert into word_of_ranklist
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="rankListId != null">rank_list_id,</if>
+            <if test="wordId != null and wordId != ''">word_id,</if>
+            <if test="rankNum != null">rank_num,</if>
+            <if test="delFlag != null and delFlag != ''">del_flag,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="rankListId != null">#{rankListId},</if>
+            <if test="wordId != null and wordId != ''">#{wordId},</if>
+            <if test="rankNum != null">#{rankNum},</if>
+            <if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWordOfRanklist" parameterType="WordOfRanklist">
+        update word_of_ranklist
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="rankListId != null">rank_list_id = #{rankListId},</if>
+            <if test="wordId != null and wordId != ''">word_id = #{wordId},</if>
+            <if test="rankNum != null">rank_num = #{rankNum},</if>
+            <if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWordOfRanklistById" parameterType="Long">
+        delete from word_of_ranklist where id = #{id}
+    </delete>
+
+    <delete id="deleteWordOfRanklistByIds" parameterType="String">
+        delete from word_of_ranklist where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

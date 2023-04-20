@@ -35,6 +35,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectWordSortOriginVo"/>
         where word_info is null or word_info=''
     </select>
+
+
+    <!-- 查询id列表 -->
+    <select id="selectWordSortOriginIdList" resultType="Long">
+        select id from word_sort_origin order by id
+    </select>
+
     
     <select id="selectWordSortOriginById" parameterType="Long" resultMap="WordSortOriginResult">
         <include refid="selectWordSortOriginVo"/>

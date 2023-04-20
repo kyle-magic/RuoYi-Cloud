@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.WordMeanMapper">
+    
+    <resultMap type="WordMean" id="WordMeanResult">
+        <result property="id"    column="id"    />
+        <result property="word"    column="word"    />
+        <result property="wordId"    column="word_id"    />
+        <result property="wordType"    column="word_type"    />
+        <result property="wordMean"    column="word_mean"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectWordMeanVo">
+        select id, word, word_id, word_type, word_mean, create_by, create_time, update_by, update_time, remark from word_mean
+    </sql>
+
+    <select id="selectWordMeanList" parameterType="WordMean" resultMap="WordMeanResult">
+        <include refid="selectWordMeanVo"/>
+        <where>  
+            <if test="word != null  and word != ''"> and word = #{word}</if>
+            <if test="wordId != null  and wordId != ''"> and word_id = #{wordId}</if>
+            <if test="wordType != null  and wordType != ''"> and word_type = #{wordType}</if>
+            <if test="wordMean != null  and wordMean != ''"> and word_mean = #{wordMean}</if>
+        </where>
+    </select>
+    
+    <select id="selectWordMeanById" parameterType="Long" resultMap="WordMeanResult">
+        <include refid="selectWordMeanVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWordMean" parameterType="WordMean" useGeneratedKeys="true" keyProperty="id">
+        insert into word_mean
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="word != null and word != ''">word,</if>
+            <if test="wordId != null and wordId != ''">word_id,</if>
+            <if test="wordType != null and wordType != ''">word_type,</if>
+            <if test="wordMean != null and wordMean != ''">word_mean,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="word != null and word != ''">#{word},</if>
+            <if test="wordId != null and wordId != ''">#{wordId},</if>
+            <if test="wordType != null and wordType != ''">#{wordType},</if>
+            <if test="wordMean != null and wordMean != ''">#{wordMean},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWordMean" parameterType="WordMean">
+        update word_mean
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="word != null and word != ''">word = #{word},</if>
+            <if test="wordId != null and wordId != ''">word_id = #{wordId},</if>
+            <if test="wordType != null and wordType != ''">word_type = #{wordType},</if>
+            <if test="wordMean != null and wordMean != ''">word_mean = #{wordMean},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWordMeanById" parameterType="Long">
+        delete from word_mean where id = #{id}
+    </delete>
+
+    <delete id="deleteWordMeanByIds" parameterType="String">
+        delete from word_mean where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 批量插入 -->
+    <insert id="insertWordMeanBatch" parameterType="java.util.List">
+        insert into word_mean(word, word_id, word_type, word_mean)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                #{item.word},
+                #{item.wordId},
+                #{item.wordType},
+                #{item.wordMean}
+            </trim>
+        </foreach>
+    </insert>
+
+</mapper>

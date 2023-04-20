@@ -1,5 +1,12 @@
 package com.ruoyi.biz.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.biz.domain.Word;
+import com.ruoyi.biz.domain.WordMean;
+import com.ruoyi.biz.mapper.WordMapper;
+import com.ruoyi.biz.mapper.WordMeanMapper;
 import com.ruoyi.common.log.aspect.LogAspect;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +15,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import com.ruoyi.common.core.utils.DateUtils;
+import java.util.Objects;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -35,6 +43,12 @@ public class WordSortOriginServiceImpl implements IWordSortOriginService
 
     @Autowired
     private WordSortOriginMapper wordSortOriginMapper;
+
+    @Autowired
+    private WordMapper wordMapper;
+
+    @Autowired
+    private WordMeanMapper wordMeanMapper;
 
     /**
      * 查询单词排行榜
@@ -211,4 +225,168 @@ public class WordSortOriginServiceImpl implements IWordSortOriginService
 
     }
 
+    /**
+     * 解析wordMean
+     */
+    public Integer parseWordMean(Integer index){
+
+        //开启新线程
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //查询所有单词排行榜
+                //List<WordSortOrigin> wordSortOriginList = wordSortOriginMapper.selectWordSortEmpty(new WordSortOrigin());
+                List<Long> ids = wordSortOriginMapper.selectWordSortOriginIdList();
+
+                //遍历爬取数据
+                List<WordMean> writeBuffer = new ArrayList<>(100);
+
+                System.out.println("---->>> parse word mean");
+                for (Long id : ids) {
+                    if (id <= index )
+                        continue;
+
+                    WordSortOrigin wordSortOrigin = wordSortOriginMapper.selectWordSortOriginById(id);
+                    //解析
+                    writeBuffer.addAll(infoToMean(wordSortOrigin.getWordInfo(), wordSortOrigin.getWord()));
+
+                    if (writeBuffer.size() >= 100) {
+                        //批量更新
+                        System.out.println("---->>> insert word mean");
+                        wordMeanMapper.insertWordMeanBatch(writeBuffer);
+                        writeBuffer.clear();
+                        System.out.println("---->>> end insert:" + id);
+                    }
+
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (writeBuffer.size()>0) {
+                    //批量更新
+                    wordMeanMapper.insertWordMeanBatch(writeBuffer);
+                    writeBuffer.clear();
+                }
+            }
+        }).start();
+
+        return 1;
+    }
+
+    private List<WordMean> infoToMean(String wordInfo, String word){
+        JSONObject obj = JSON.parseObject(wordInfo);
+        JSONArray messages = obj.getJSONArray("message");
+
+        List<WordMean> wordMeanList = new ArrayList<>();
+
+        if (Objects.isNull(messages)) {
+            return wordMeanList;
+        }
+        System.out.println("------>>>word:" + word);
+        Word w = wordMapper.selectWordByWord(word);
+
+        for (int i=0; i<messages.size(); i++) {
+            JSONObject msg = messages.getJSONObject(i);
+            if (!msg.getString("key").equals(word)) {
+                continue;
+            }
+
+            JSONArray means = msg.getJSONArray("means");
+            if (Objects.isNull(means)) {
+                continue;
+            }
+
+            for (int j=0; j < means.size(); j++) {
+                JSONObject mean = means.getJSONObject(j);
+                WordMean wm = new WordMean();
+                wm.setWordMean(mean.getString("means"));
+                wm.setWordType(mean.getString("part"));
+                wm.setWordId(w.getId());
+                wm.setWord(w.getWord());
+
+                wordMeanList.add(wm);
+            }
+        }
+        return wordMeanList;
+    }
+
+    private String getMeanStr(String wordInfo, String word){
+        JSONObject obj = JSON.parseObject(wordInfo);
+        JSONArray messages = obj.getJSONArray("message");
+
+        if (Objects.isNull(messages)) {
+            return "";
+        }
+        System.out.println("------>>>word:" + word);
+        Word w = wordMapper.selectWordByWord(word);
+
+        for (int i=0; i<messages.size(); i++) {
+            JSONObject msg = messages.getJSONObject(i);
+            if (!msg.getString("key").equals(word)) {
+                continue;
+            }
+
+            JSONArray means = msg.getJSONArray("means");
+            if (Objects.isNull(means)) {
+                continue;
+            }
+
+            return means.toString();
+        }
+        return "";
+    }
+
+    public Integer redundancyWordMean(Integer index){
+
+        //开启新线程
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //查询所有单词排行榜
+                //List<WordSortOrigin> wordSortOriginList = wordSortOriginMapper.selectWordSortEmpty(new WordSortOrigin());
+                List<Long> ids = wordSortOriginMapper.selectWordSortOriginIdList();
+
+                //遍历爬取数据
+                List<Word> writeBuffer = new ArrayList<>(100);
+
+                System.out.println("---->>> redundancy word mean");
+                for (Long id : ids) {
+                    if (id <= index )
+                        continue;
+
+                    WordSortOrigin wordSortOrigin = wordSortOriginMapper.selectWordSortOriginById(id);
+                    //解析
+                    String meanStr = getMeanStr(wordSortOrigin.getWordInfo(), wordSortOrigin.getWord());
+                    Word w = new Word();
+                    w.setId(wordSortOrigin.getId());
+                    w.setWordMeanRedundancy(meanStr);
+
+                    writeBuffer.add(w);
+
+                    if (writeBuffer.size() >= 100) {
+                        //批量更新
+                        System.out.println("---->>> update word.mean");
+                        wordMapper.batchUpdateWord(writeBuffer);
+                        writeBuffer.clear();
+                        System.out.println("---->>> end update:" + id);
+                    }
+
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (writeBuffer.size()>0) {
+                    //批量更新
+                    wordMapper.batchUpdateWord(writeBuffer);
+                    writeBuffer.clear();
+                }
+            }
+        }).start();
+
+        return 1;
+    }
 }
